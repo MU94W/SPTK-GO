@@ -13,4 +13,4 @@ cmds:
       
       run command:
       
-      bazel-bin/bin/mlpg/mlpgGO -m 59 in.bin > out.bin
+      OMP_NUM_THREADS=1 bazel-bin/bin/mlpg/mlpgGO -m 59 in.bin > out.bin

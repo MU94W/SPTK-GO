@@ -5,7 +5,7 @@
 *                                    2018.9  Mu Wang                                    *
 *                                                                                       *
 *       usage:                                                                          *
-*               mlpg [ options ] [infile] > stdout                                      *
+*               mlpgGO [ options ] [infile] > stdout                                    *
 *       options:                                                                        *
 *               -m m              : order of vector                              [25]   *
 *               -h                : print this message                                  *
