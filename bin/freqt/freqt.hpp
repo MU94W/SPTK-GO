@@ -1,0 +1,1 @@
+void freqt(double *c1, const int m1, double *c2, const int m2, const double a);

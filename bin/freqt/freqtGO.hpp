@@ -1,0 +1,1 @@
+FrameSeq *freqtGO(FrameSeq *c1, const int m1, const float a1, const int m2, const float a2);
