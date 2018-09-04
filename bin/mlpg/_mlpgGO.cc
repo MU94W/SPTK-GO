@@ -28,14 +28,9 @@ Args:
 
     FrameSeq *tmp = FrameSeq_new(n, static_dimension);
     tmp->len = static_dimension;
+    b = ft->data;       d_b = b + static_dimension*n;       dd_b = d_b + static_dimension*n;
+    tau = ct->data;     d_tau = tau + static_dimension*n;   dd_tau = d_tau + static_dimension*n;
     for (int i = 0; i < static_dimension; i++) {
-        b = ft->data + i*n;
-        d_b = ft->data + (static_dimension + i)*n;
-        dd_b = ft->data + (static_dimension*2 + i)*n;
-
-        tau = ct->data + i*n;
-        d_tau = ct->data + (static_dimension + i)*n;
-        dd_tau = ct->data + (static_dimension*2 + i)*n;
         d_tau[0] = 1e11;
         d_tau[n-1] = 1e11;
         dd_tau[0] = 1e11;
@@ -51,8 +46,10 @@ Args:
         }
 
         build_poe(b, d_b, dd_b, ret_b, tau, d_tau, dd_tau, ret_prec, n);
-
         pentaband_linearsolve(ret_prec, ret_b, tmp->data + i*n, n);
+
+        b += n;     d_b += n;       dd_b += n;
+        tau += n;   d_tau += n;     dd_tau += n;
     }
 
     FrameSeq *ret = FrameSeq_transcopy(tmp);
@@ -77,12 +74,6 @@ void build_poe(const float *b, const float *d_b, const float *dd_b, float *ret_b
     static const float dd_l = 1.;
     static const float dd_c = -2.;
     static const float dd_u = 1.;
-
-    // clear ret_b, ret_prec
-    // no need to reset ret_b
-    // memset(ret_b, 0x00, n*sizeof(float));
-    // no need to reset ret_prec
-    // memset(ret_prec, 0x00, sizeof ret_prec);  // [(0, 0, c, u_0, u_1), (0, l_0, c, u_0, u_1), ..., (l_1, l_0, c, 0, 0)]
 
     // 1st. bm.dot_mv_plus_equals
     ret_b[0] = b[0] + d_u*d_b[1] + dd_c*dd_b[0] + dd_u*dd_b[1];
