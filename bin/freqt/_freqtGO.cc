@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+//#include <time.h>
 
 #include "lib/common.hpp"
 //#include "mkl.h"
@@ -9,26 +9,18 @@
 
 FrameSeq *freqtGO(FrameSeq *c1, const int m1, const float a1, const int m2, const float a2)
 {
-      const float a = (a1 - a2) / (1 - a1*a2);
+      const float a = (a2 - a1) / (1 - a1*a2);
       const float b = 1 - a*a;
       
-      clock_t start, end;
-      float dur;
-
       // c1t: c1 tranposed version
-      start = clock();
       FrameSeq *c1t = FrameSeq_transcopy(c1);
-      end = clock();
-      dur = (float)(end - start) / CLOCKS_PER_SEC;
-      fprintf(stderr, "Transpose c1 costs: %f s.\n", dur);
       // g, d: for temp cal
       // init with all 0s.
-      FrameSeq *g = FrameSeq_new(c1->len, m2+1);
-      g->len = c1->dim;
-      FrameSeq *d = FrameSeq_new(c1->len, m2+1);
-      d->len = c1->dim;
+      FrameSeq *g = FrameSeq_new(c1t->dim, m2+1);
+      g->len = m2+1;
+      FrameSeq *d = FrameSeq_new(c1t->dim, m2+1);
+      d->len = m2+1;
 
-      start = clock();
       for (int i=-m1; i <= 0; i++) {
             // m = 0
             if (0 <= m2) {
@@ -47,9 +39,6 @@ FrameSeq *freqtGO(FrameSeq *c1, const int m1, const float a1, const int m2, cons
                   cblas_saxpy(g->dim, 1, d->data+(j-1)*d->dim, 1, g->data+j*g->dim, 1);
             }
       }
-      end = clock();
-      dur = (float)(end - start) / CLOCKS_PER_SEC;
-      fprintf(stderr, "Calculating c2 costs: %f s.\n", dur);
 
       FrameSeq *c2 = FrameSeq_transcopy(g);
 
