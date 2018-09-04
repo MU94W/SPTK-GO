@@ -5,7 +5,7 @@
 
 #include "lib/common.hpp"
 //#include "mkl.h"
-#include "cblas.h"
+//#include "cblas.h"
 #include "mlpgGO.hpp"
 
 FrameSeq *mlpgGO(FrameSeq *features, FrameSeq *covariance, const int static_dimension)
@@ -75,19 +75,17 @@ void build_poe(const float *b, const float *d_b, const float *dd_b, float *ret_b
     static const float dd_u = 1.;
 
     // clear ret_b, ret_prec
-    memset(ret_b, 0x00, n*sizeof(float));
+    // no need to reset ret_b
+    // memset(ret_b, 0x00, n*sizeof(float));
     // no need to reset ret_prec
     // memset(ret_prec, 0x00, sizeof ret_prec);  // [(0, 0, c, u_0, u_1), (0, l_0, c, u_0, u_1), ..., (l_1, l_0, c, 0, 0)]
 
     // 1st. bm.dot_mv_plus_equals
-    //  add bandmat_0 with b. actually, we do copy
-    cblas_scopy(n, b, 1, ret_b, 1); // heard that it is a little faster than memcpy
-    // add bandmat_1 with d_b, and bandmat_2 with dd_b.
-    ret_b[0] += d_u*d_b[1] + dd_c*dd_b[0] + dd_u*dd_b[1];
+    ret_b[0] = b[0] + d_u*d_b[1] + dd_c*dd_b[0] + dd_u*dd_b[1];
     for (int i = 1; i < n-1; i++) {
-        ret_b[i] += d_l*d_b[i-1] + d_u*d_b[i+1] + dd_l*dd_b[i-1] + dd_c*dd_b[i] + dd_u*dd_b[i+1];
+        ret_b[i] = b[i] + d_l*d_b[i-1] + d_u*d_b[i+1] + dd_l*dd_b[i-1] + dd_c*dd_b[i] + dd_u*dd_b[i+1];
     }
-    ret_b[n-1] += d_l*d_b[n-2] + dd_l*dd_b[n-2] + dd_c*dd_b[n-1];
+    ret_b[n-1] = b[n-1] + d_l*d_b[n-2] + dd_l*dd_b[n-2] + dd_c*dd_b[n-1];
 
     // 2nd. bm.dot_mm_plus_equals
     static const float d_lu = d_l*d_u;
