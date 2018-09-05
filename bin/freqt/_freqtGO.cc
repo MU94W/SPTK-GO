@@ -6,9 +6,12 @@
 //#include "mkl.h"
 #include "cblas.h"
 
+#include <fenv.h>
+
 
 FrameSeq *freqtGO(FrameSeq *c1, const int m1, const float a1, const int m2, const float a2)
 {
+      fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV); // avoid denormal float point values
       const float a = (a2 - a1) / (1 - a1*a2);
       const float b = 1 - a*a;
       
