@@ -23,4 +23,4 @@ cmds:
       
       run command:
       
-      OMP_NUM_THREADS=1 bazel-bin/bin/mlpg/mlpgGO -m 59 -M 513 in.bin > out.bin
+      OMP_NUM_THREADS=1 bazel-bin/bin/freqt/freqtGO -m 59 -M 513 in.bin > out.bin
