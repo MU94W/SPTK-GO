@@ -1,0 +1,1 @@
+build:copt -c opt –copt=-mavx –copt=-mavx2 –copt=-mfma –copt=-mfpmath=both –copt=-msse4.2
