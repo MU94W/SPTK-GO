@@ -4,9 +4,10 @@
 #include <time.h>
 
 #include "lib/common.hpp"
-//#include "mkl.h"
+#include "mkl.h"
 //#include "cblas.h"
-#include <fenv.h>
+// #include <fenv.h>
+#include <xmmintrin.h>
 
 void build_poe(const float *b, const float *d_b, const float *dd_b, float *ret_b,
                const float *tau, const float *d_tau, const float *dd_tau, float *ret_prec, const int n);
@@ -21,7 +22,8 @@ Args:
     static_dimension:
 */
 {
-    fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV); // avoid denormal float point values
+    // fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV); // avoid denormal float point values
+    _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
     FrameSeq *ft = FrameSeq_transcopy(features);
     FrameSeq *ct = FrameSeq_transcopy(covariance);
