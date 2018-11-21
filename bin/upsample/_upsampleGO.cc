@@ -3,8 +3,8 @@
 #include <time.h>
 
 #include "lib/common.hpp"
-//#include "mkl.h"
-#include "cblas.h"
+#include "mkl.h"
+// #include "cblas.h"
 
 
 FrameSeq *upsampleGO(FrameSeq *c1, const int ratio) {
