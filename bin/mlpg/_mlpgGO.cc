@@ -4,9 +4,10 @@
 #include <time.h>
 
 #include "lib/common.hpp"
-//#include "mkl.h"
+#include "mkl.h"
 //#include "cblas.h"
-#include <fenv.h>
+// #include <fenv.h>
+#include <xmmintrin.h>
 
 void build_poe(const float *b, const float *d_b, const float *dd_b, float *ret_b,
                const float *tau, const float *d_tau, const float *dd_tau, float *ret_prec, const int n);
@@ -21,13 +22,16 @@ Args:
     static_dimension:
 */
 {
-    fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV); // avoid denormal float point values
+    // fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV); // avoid denormal float point values
+    _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
     FrameSeq *ft = FrameSeq_transcopy(features);
     FrameSeq *ct = FrameSeq_transcopy(covariance);
     int n = features->len;
     float *b, *d_b, *dd_b, *ret_b = (float *)malloc(n*sizeof(float));
     float *tau, *d_tau, *dd_tau, *ret_prec = (float *)malloc(5*n*sizeof(float));
+    memset(ret_prec, 0, 5 * n * sizeof(float));
+    memset(ret_b, 0, n * sizeof(float));
 
     FrameSeq *tmp = FrameSeq_new(n, static_dimension);
     tmp->len = static_dimension;
@@ -97,9 +101,9 @@ void build_poe(const float *b, const float *d_b, const float *dd_b, float *ret_b
     static const float dd_uu = dd_u*dd_u;
     for (int i = 0; i < n; i++) {
         if (i >= 2) ret_prec[5*i] = d_lu*d_tau[i-1] + dd_lu*dd_tau[i-1];
-        if (i >= 1) ret_prec[5*i+1] = dd_lc*dd_tau[i-1] + dd_cu*dd_tau[i];
-        ret_prec[5*i+2] = tau[i] + (d_ll*d_tau[i-1] + d_uu*d_tau[i+1]) + (dd_ll*dd_tau[i-1] + dd_cc*dd_tau[i] + dd_uu*dd_tau[i+1]);
-        if (i <= n-2) ret_prec[5*i+3] = dd_lc*dd_tau[i] + dd_cu*dd_tau[i+1];
+        if (i >= 1) {ret_prec[5*i+1] = dd_lc*dd_tau[i-1] + dd_cu*dd_tau[i]; ret_prec[5*i+2] = d_ll*d_tau[i-1] + dd_ll*dd_tau[i-1];}
+        ret_prec[5*i+2] += tau[i]  + dd_cc*dd_tau[i];
+        if (i <= n-2) {ret_prec[5*i+3] = dd_lc*dd_tau[i] + dd_cu*dd_tau[i+1]; ret_prec[5*i+2] += d_uu*d_tau[i+1] + dd_uu*dd_tau[i+1];}
         if (i <= n-3) ret_prec[5*i+4] = d_lu*d_tau[i+1] + dd_lu*dd_tau[i+1];
     }
 

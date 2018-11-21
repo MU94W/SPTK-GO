@@ -1,11 +1,15 @@
 # SPTK-GO
 SPTK-GO -- let's make it faster!
 
-dependencies
+## dependencies
 
-  [OpenBLAS](http://www.openblas.net/)
+    mkl
 
-cmds:
+## install
+
+    mkdir build && cmake .. && make -j
+
+## cmds:
 
   implemented
   
